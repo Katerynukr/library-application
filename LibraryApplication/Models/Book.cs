@@ -8,14 +8,19 @@ namespace LibraryApplication.Models
 {
     public class Book
     {
+        public int Id { get; } = 0;
         public string Name { get; set; }
-        public string[] Author { get; set; }
-        public string[] Category { get; set; }
-        public string Language { get; set; }
-        public DateTime PublicationDate { get; set; }
+        public Author Author { get; set; }
+        public Categories Category{ get; set; }
+        public Languages Language { get; set; }
+        public int PublicationDate { get; set; }
         public string ISBN { get; set; }
         public Customer Customer { get; set; }
         public bool IsTaken = false;
+        public Book()
+        {
+            this.Id++;
+        }
 
     }
 }

@@ -8,7 +8,8 @@ namespace LibraryApplication.Models
 {
     public class Book
     {
-        public int Id { get; } = 0;
+        private static int NextId { get; set; } = 1;
+        public int Id { get; private set; } = 0;
         public string Name { get; set; }
         public Author Author { get; set; }
         public Categories Category{ get; set; }
@@ -19,7 +20,8 @@ namespace LibraryApplication.Models
         public bool IsTaken = false;
         public Book()
         {
-            this.Id++;
+            Id = NextId;
+            NextId++;
         }
 
     }

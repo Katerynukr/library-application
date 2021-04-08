@@ -8,15 +8,16 @@ namespace LibraryApplication.Models
 {
     public enum Categories
     {
-        Tragedy,
-        Gothic,
-        Adventure,
-        Fxiction,
-        Romance,
-        Science,
-        Fiction,
-        Thriller,
-        Drama,
-        Horror
+        fantasy,
+        tragedy,
+        gothic,
+        adventure,
+        fxiction,
+        romance,
+        dcience,
+        fiction,
+        thriller,
+        drama,
+        horror
     }
 }

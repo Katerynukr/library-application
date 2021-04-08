@@ -29,10 +29,10 @@ namespace LibraryApplicationTest
                 Language = Languages.English,
                 IsTaken = false
             };
-            var newList = new List<Book>();
+            var newList = new IEnumerable<Book>();
             newList.Append(book);
             var dataService = new DataService();
              dataService.ParseToJsonFile(newList);*/
-        }
+        //}
     }
 }

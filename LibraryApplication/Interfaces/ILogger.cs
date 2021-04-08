@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryApplication.Models
+namespace LibraryApplication.Interfaces
 {
-    public enum Languages
+    public interface ILogger
     {
-        english,
-        german,
-        lithanian
+        void Write(string input);
+        string Read();
     }
 }

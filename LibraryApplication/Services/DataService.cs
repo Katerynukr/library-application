@@ -11,16 +11,15 @@ namespace LibraryApplication.Services
 {
     public class DataService
     {
-        public IEnumerable<Book> books {get; set;}
-        private string path = "Data\\BooksList.json";
+        private const string path = @"Data\BooksList.json";
         public IEnumerable<Book> ParseFromJsonFile()
         {
-            if (this.path != null)
+            if (path != null)
             {
-                using (StreamReader r = new StreamReader(this.path))
+                using (StreamReader r = new StreamReader(path))
                 {
                     string json = r.ReadToEnd();
-                    books = JsonConvert.DeserializeObject<IEnumerable<Book>>(json);
+                    IEnumerable<Book> books = JsonConvert.DeserializeObject<IEnumerable<Book>>(json);
                     return books;
                 }
             }
@@ -29,15 +28,17 @@ namespace LibraryApplication.Services
                 throw new FileNotFoundException();
             }
         }
-        public void ParseToJsonFile(IEnumerable<Book> newBooksList)
+        public void ParseToJsonFile(List<Book> newBooksList)
         {
-            if (this.path != null && newBooksList != null)
+            if (path != null && newBooksList != null)
             {
-                using (StreamWriter file = File.CreateText(this.path))
-{
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(file, newBooksList);
-                }
+                //TODO:HOW TOWRITE
+                File.WriteAllText(@"C:\Users\kater\Documents\dot-net\LibraryApplication\LibraryApplication\Data\BooksList.json", JsonConvert.SerializeObject(newBooksList));
+                /* using (StreamWriter file = File.CreateText(path))
+ {
+                     JsonSerializer serializer = new JsonSerializer();
+                     serializer.Serialize(file, newBooksList);
+                 }*/
             }
             else
             {

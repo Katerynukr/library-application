@@ -25,9 +25,9 @@ namespace LibraryApplicationTest
                 {"Language", "English" },
                 {"ISBN", "325671" }
             };
-            var map = new MapToBookService();
+            var map = new ConverterService();
 
-            var result = map.MapUserInput(userInput);
+            var result = map.ConvertToBook(userInput);
 
             result.Should().NotBeNull();
             result.Name.Should().Be("Romeo and Juliet");

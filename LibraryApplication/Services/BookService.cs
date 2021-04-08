@@ -9,68 +9,66 @@ namespace LibraryApplication.Services
 {
     public class BookService
     {
-        private readonly DataService _dataService;
-        private readonly MapToBookService _mapToBookService;
-        public BookService(DataService dataService, MapToBookService mapToBookService)
+        private readonly BookRepositoryService _bookRepositoryService;
+        private readonly ConverterService _converterService;
+        private readonly BookInputValidation _bookInputValidation;
+        public BookService()
         {
-            _dataService = dataService;
-            _mapToBookService = mapToBookService;
+            _bookRepositoryService = new BookRepositoryService(); 
+            _converterService = new ConverterService();
+            _bookInputValidation = new BookInputValidation();
         }
 
-        public IEnumerable<Book> ListAllBooks()
+        public List<Book> ListAllBooks()
         {
-            return _dataService.ParseFromJsonFile();
+            return _bookRepositoryService.GetAll();
         }
 
-        public void AddBook(Dictionary<string, string> userInput)
+        public void AddNewBook(Dictionary<string, string> userInput)
         {
-            _dataService.ParseFromJsonFile();
-            var book = _mapToBookService.MapUserInput(userInput);
-            IEnumerable<Book> newList = _dataService.books.Append(book);
-            _dataService.ParseToJsonFile(newList);
-            //TODO: input validation
-        }
-
-        public void DeleteBook(int id)
-        {
-            _dataService.ParseFromJsonFile();
-            var booksList = _dataService.books.ToList();
-            var book = booksList.FirstOrDefault(b => b.Id == id);
-            if(book != null)
+            var userInputValidationResult = _bookInputValidation.IsValidDataForNewBook(userInput);
+            if (userInputValidationResult == true)
             {
-                booksList.Remove(book);
-                _dataService.ParseToJsonFile(booksList);
+                var book = _converterService.ConvertToBook(userInput);
+                _bookRepositoryService.Post(book);
             }
         }
 
-        public void TakeBook(int id, Customer customer)
+        public void DeleteBook(string idString)
         {
-            //TODO: AMOUNT  DATE
-            _dataService.ParseFromJsonFile();
-            var booksList = _dataService.books.ToList();
-            var book = booksList.FirstOrDefault(b => b.Id == id);
-            if(!book.IsTaken)
+            var isValidStringId = _bookInputValidation.IsValidStringId(idString);
+            if (isValidStringId)
             {
-                book.IsTaken = true;
-                book.Customer = customer;
-                IEnumerable<Book> newList = _dataService.books.Append(book);
-                _dataService.ParseToJsonFile(newList);
+                int id = _converterService.ConvertToInteger(idString);
+                _bookRepositoryService.DeleteById(id);
             }
         }
 
-        public void ReturnBook(int id)
+        public void BorrowBook(string[] bookIdsString, Dictionary<string, string> customerDataInput, string estimatedReturnDateString)
         {
-            //TODO:Message
-            _dataService.ParseFromJsonFile();
-            var booksList = _dataService.books.ToList();
-            var book = booksList.FirstOrDefault(b => b.Id == id);
-            if (book.IsTaken)
+
+            var userInputValidationResult = _bookInputValidation.IsValidDataToBorrowBook(customerDataInput, estimatedReturnDateString, bookIdsString);
+            if (userInputValidationResult == true)
             {
-                book.IsTaken = false;
-                book.Customer = null;
-                IEnumerable<Book> newList = _dataService.books.Append(book);
-                _dataService.ParseToJsonFile(newList);
-            } 
+                //how many ids not nore than 3
+                var customer = _converterService.ConvertToCustomer(customerDataInput, estimatedReturnDateString);
+                var ids = _converterService.ConvertToIntegerArray(bookIdsString);
+                foreach (var id in ids)
+                {
+                    _bookRepositoryService.UpdateBorrowById(id, customer);
+                }
+            }
+        }
+
+        public void ReturnBook(string idString)
+        {
+            var isValidStringId = _bookInputValidation.IsValidStringId(idString);
+            if (isValidStringId)
+            {
+                int id = _converterService.ConvertToInteger(idString);
+                //TODO:Message
+                _bookRepositoryService.RerurnById(id);
+            }
         }
     }
 }

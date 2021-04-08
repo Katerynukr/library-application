@@ -48,7 +48,7 @@ namespace LibraryApplicationTest
             };
             var bookValidation = new BookInputValidation();
 
-            var result = bookValidation.IsValidPublicationDate(userInput);
+            var result = bookValidation.IsValidPublicationYear(userInput);
 
             result.Should().BeFalse();
         }

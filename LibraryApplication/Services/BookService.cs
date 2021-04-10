@@ -1,4 +1,5 @@
 ﻿using LibraryApplication.Models;
+using LibraryApplication.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,66 +10,76 @@ namespace LibraryApplication.Services
 {
     public class BookService
     {
-        private readonly BookRepositoryService _bookRepositoryService;
+        private readonly BookRepository _bookRepository;
         private readonly ConverterService _converterService;
-        private readonly BookInputValidation _bookInputValidation;
+        private readonly BookInputValidationService _bookInputValidationService;
+
         public BookService()
         {
-            _bookRepositoryService = new BookRepositoryService(); 
+            _bookRepository = new BookRepository(); 
             _converterService = new ConverterService();
-            _bookInputValidation = new BookInputValidation();
+            _bookInputValidationService = new BookInputValidationService();
         }
 
-        public List<Book> ListAllBooks()
+        public List<Book> GetAllBooks()
         {
-            return _bookRepositoryService.GetAll();
+            return _bookRepository.GetAll().Where(b => b.IsTaken == false).ToList();
         }
 
         public void AddNewBook(Dictionary<string, string> userInput)
         {
-            var userInputValidationResult = _bookInputValidation.IsValidDataForNewBook(userInput);
+            var userInputValidationResult = _bookInputValidationService.IsValidDataForNewBook(userInput);
             if (userInputValidationResult == true)
             {
                 var book = _converterService.ConvertToBook(userInput);
-                _bookRepositoryService.Post(book);
+                _bookRepository.Post(book);
             }
         }
 
         public void DeleteBook(string idString)
         {
-            var isValidStringId = _bookInputValidation.IsValidStringId(idString);
+            var isValidStringId = _bookInputValidationService.IsValidStringId(idString);
             if (isValidStringId)
             {
                 int id = _converterService.ConvertToInteger(idString);
-                _bookRepositoryService.DeleteById(id);
+                _bookRepository.DeleteById(id);
             }
         }
 
-        public void BorrowBook(string[] bookIdsString, Dictionary<string, string> customerDataInput, string estimatedReturnDateString)
+        public void BorrowBook(string[] bookIdsString, Dictionary<string, string> customerDataInput)
         {
-
-            var userInputValidationResult = _bookInputValidation.IsValidDataToBorrowBook(customerDataInput, estimatedReturnDateString, bookIdsString);
+            var userInputValidationResult = _bookInputValidationService.IsValidDataToBorrowBook(customerDataInput, bookIdsString);
             if (userInputValidationResult == true)
             {
-                //how many ids not nore than 3
-                var customer = _converterService.ConvertToCustomer(customerDataInput, estimatedReturnDateString);
+                var borrowDate = DateTime.Now;
+                var customer = _converterService.ConvertToCustomer(customerDataInput, borrowDate);
                 var ids = _converterService.ConvertToIntegerArray(bookIdsString);
+                var countOfIds = 0;
                 foreach (var id in ids)
                 {
-                    _bookRepositoryService.UpdateBorrowById(id, customer);
+                    if(countOfIds < 3)
+                    {
+                        _bookRepository.UpdateBorrowById(id, customer);
+                        countOfIds++;
+                        break;
+                    }
                 }
             }
         }
 
         public void ReturnBook(string idString)
         {
-            var isValidStringId = _bookInputValidation.IsValidStringId(idString);
+            var isValidStringId = _bookInputValidationService.IsValidStringId(idString);
             if (isValidStringId)
             {
                 int id = _converterService.ConvertToInteger(idString);
-                //TODO:Message
-                _bookRepositoryService.RerurnById(id);
+                _bookRepository.RerurnById(id);
             }
+        }
+
+        public void SaveChanges()
+        {
+            _bookRepository.SaveChanges();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using LibraryApplication.Interfaces;
-using LibraryApplication.Services.Messages;
+using LibraryApplication.Loggers;
+using LibraryApplication.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,89 +9,91 @@ using System.Threading.Tasks;
 
 namespace LibraryApplication.Services
 {
-    public class UIService
+    public class UIService 
     {
-        private readonly DisplayMessageService _displayMessageService;
+        private readonly ConsoleLogger _consoleLogger;
         private readonly BookService _bookService;
-        private readonly InstructionService _instructionService;
 
-        public UIService(ILogger logger)
+        public UIService()
         {
-            _displayMessageService = new DisplayMessageService(logger);
+            _consoleLogger = new ConsoleLogger();
             _bookService = new BookService();
-            _instructionService = new InstructionService();
         }
 
-        public string DisplayListOfCommands()
+        public void DisplayCommands()
         {
-            string availableCommands = _instructionService.ReturnAvailableCommands();
-            _displayMessageService.WriteResult(availableCommands);
-            var command = _displayMessageService.ReadCommand().Trim().ToLower();
+            string availableCommands = InstructionHelpers.GetCommands();
+            _consoleLogger.Write(availableCommands);
+            
+        }
+        public string ReadCommands()
+        {
+            var command = _consoleLogger.Read().Trim().ToLower();
             return command;
         }
 
-        public void GenerateListOfBooks()
+        
+        public void GenerateBooksList()
         {
-            var books = _bookService.ListAllBooks();
-            var availableBooks = books.Where(b => b.IsTaken == false).ToList();
-            availableBooks.ForEach(b => _displayMessageService.WriteResult($"Id: {b.Id} Title: {b.Name} \n " +
+            var availableBooks = _bookService.GetAllBooks();
+            availableBooks.ForEach(b => _consoleLogger.Write($"Id: {b.Id} Title: {b.Name} \n " +
                 $"Author: {b.Author.Name} {b.Author.Surname}"));
         }
 
         public void AddNewBook()
         {
-            var instructionForUser = _instructionService.RerturnInstructionsToAddNewBook();
-            var dataFieldsToCreateBook = _instructionService.ReturnDataFieldsToCreateBook();
+            var instructionForUser = InstructionHelpers.GetAddNewBookInstructions();
+            var dataFieldsToCreateBook = InstructionHelpers.GetBookFields();
             Dictionary<string, string> userInputForNewBook = new Dictionary<string, string>();
-            _displayMessageService.WriteResult(instructionForUser);
+            _consoleLogger.Write(instructionForUser);
             foreach (var bookField in dataFieldsToCreateBook)
             {
-                _displayMessageService.WriteResult(bookField);
-                var input = _displayMessageService.ReadCommand().Trim().ToLower();
+                _consoleLogger.Write(bookField);
+                var input = _consoleLogger.Read().Trim().ToLower();
                 userInputForNewBook.Add(bookField, input);
             }
             _bookService.AddNewBook(userInputForNewBook);
-            //TODO:MESSAGES FOR SUCCESS
-            //TODO:MESSAGES FOR error
-
         }
+
         public void DeleteBook()
         {
-            string instructionToDeleteBook = _instructionService.ReturnInstructionsToDeleteBook();
-            _displayMessageService.WriteResult(instructionToDeleteBook);
-            var bookIdInput = _displayMessageService.ReadCommand();
+            string instructionToDeleteBook = InstructionHelpers.GetDeleteBookInstruction();
+            _consoleLogger.Write(instructionToDeleteBook);
+            var bookIdInput = _consoleLogger.Read();
             _bookService.DeleteBook(bookIdInput);
-            //TODO:MESSAGES FOR error
         }
 
         public void BorrowBook()
         {
             Dictionary<string, string> customerDataInput = new Dictionary<string, string>();
-            string instructionToBorrowBook = _instructionService.ReturnInstructionsToBorrowBook();
-            string[] customerData = _instructionService.ReturnCustomerFieldsToCreateCustomer();
-            string estimatedReturnDate = _instructionService.ReturnEstimatedReturnDateInstructions();
-            string bookIds = _instructionService.ReturnInstructionsForIdsOfBooks();
+            string instructionToBorrowBook = InstructionHelpers.GetReturnBookInstruction();
+            string[] customerData = InstructionHelpers.GetCustomerFields();
+            string bookIds = InstructionHelpers.GetIdsInstructions();
 
-            _displayMessageService.WriteResult(instructionToBorrowBook);
+            _consoleLogger.Write(instructionToBorrowBook);
             foreach (var data in customerData)
             {
-                _displayMessageService.WriteResult(data);
-                var input = _displayMessageService.ReadCommand().Trim().ToLower();
+                _consoleLogger.Write(data);
+                var input = _consoleLogger.Read().Trim().ToLower();
                 customerDataInput.Add(data, input);
             }
-            _displayMessageService.WriteResult(estimatedReturnDate);
-            var estimatedReturnDateInput = _displayMessageService.ReadCommand().Trim().ToLower();
-            _displayMessageService.WriteResult(bookIds);
-            var bookIdsInput = _displayMessageService.ReadCommand().Trim().ToLower().Split(",");
-            _bookService.BorrowBook(bookIdsInput, customerDataInput, estimatedReturnDateInput);
+            _consoleLogger.Write(bookIds);
+            var bookIdsInput = _consoleLogger.Read().Trim().ToLower().Split(",");
+
+            _bookService.BorrowBook(bookIdsInput, customerDataInput);
         }
 
         public void ReturnBook()
         {
-            string instructionsToReturnBook = _instructionService.ReturnInstructionsToReturnBook();
-            _displayMessageService.WriteResult(instructionsToReturnBook);
-            var bookIdInput = _displayMessageService.ReadCommand();
-            _bookService.ReturnBook(bookIdInput);
+            string instructionsToReturnBook = InstructionHelpers.GetReturnBookInstructions();
+            _consoleLogger.Write(instructionsToReturnBook);
+            var bookIdInput = _consoleLogger.Read();
+             _bookService.ReturnBook(bookIdInput);
+        }
+
+        public void ExitLibrary()
+        {
+            _bookService.SaveChanges();
         }
     }
 }

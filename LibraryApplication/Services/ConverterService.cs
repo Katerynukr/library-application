@@ -50,14 +50,13 @@ namespace LibraryApplication.Services
             return language;
         }
 
-        public Customer ConvertToCustomer(Dictionary<string, string> userInputForCustomerData, string estimatedReturnDateInput)
+        public Customer ConvertToCustomer(Dictionary<string, string> userInputForCustomerData, DateTime borrowDate)
         {
-            var date = ConverToDate(estimatedReturnDateInput);
             var customer = new Customer()
             {
                 Name = userInputForCustomerData["Customer Name"],
                 Surname = userInputForCustomerData["Customer Surname"],
-                BorrowDate = date
+                BorrowDate = borrowDate
             };
             return customer;
         }

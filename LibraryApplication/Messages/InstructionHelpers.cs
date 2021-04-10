@@ -4,30 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryApplication.Services.Messages
+namespace LibraryApplication.Messages
 {
-    public class InstructionService
+    public static class InstructionHelpers
     {
-        public string ReturnAvailableCommands()
+        public static string GetCommands()
         {
             string commands = "Type : " +
                 "\n list   - to get all books from library " +
                 "\n add    - to add a new book " +
                 "\n delete - to remove the book from library " +
                 "\n borrow - to borrow book from the library " +
-                "\n return - to return book to the library" +
+                "\n return - to return book to the library " +
+                "\n leave  - to leave the library" +
                 "\n";
             return commands;
         }
 
-        public string RerturnInstructionsToAddNewBook()
+        public static string GetAddNewBookInstructions()
         {
             string instructions = "Bellow you will see list of information to fill " +
                 "in order to create a new book. Please enter valid data.";
             return instructions;
         }
 
-        public string[] ReturnDataFieldsToCreateBook()
+        public static string[] GetBookFields()
         {
             string[] dataFieldsToCreateBook = {
                 "Book Title",
@@ -41,20 +42,20 @@ namespace LibraryApplication.Services.Messages
             return dataFieldsToCreateBook;
         }
 
-        public string ReturnInstructionsToDeleteBook()
+        public static string GetDeleteBookInstruction()
         {
             string instructions = "Enter id of the book that you want to delete";
             return instructions;
         }
 
-        public string ReturnInstructionsToBorrowBook()
+        public static string GetReturnBookInstruction()
         {
             string instructions = "Bellow you will see list of information to " +
                 "fill in order to borrow a book.";
             return instructions;
         }
 
-        public string[] ReturnCustomerFieldsToCreateCustomer()
+        public static string[] GetCustomerFields()
         {
             string[] customerData = {
                 "Customer Name",
@@ -63,22 +64,15 @@ namespace LibraryApplication.Services.Messages
             return customerData;
         }
 
-        public string ReturnEstimatedReturnDateInstructions()
-        {
-            string instructions = "Enter date when you plan to return a book." +
-                " Note you cannot take book for longer than two month. " +
-                "\n dd/mm/yyy";
-            return instructions;
-        }
 
-        public string ReturnInstructionsForIdsOfBooks()
+        public static string GetIdsInstructions()
         {
             string instructions = "Enter id of the books you want to boorow. " +
                 "Note that you cannot borrow more than 3 books. You have to enter id through \",\"";
             return instructions;
         }
 
-        public string ReturnInstructionsToReturnBook()
+        public static string GetReturnBookInstructions()
         {
             string instructions = "Enter id of the book that you want to return";
             return instructions;

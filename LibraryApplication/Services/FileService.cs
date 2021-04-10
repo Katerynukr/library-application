@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibraryApplication.Services
 {
-    public class DataService
+    public class FileService
     {
         private const string path = @"Data\BooksList.json";
         public IEnumerable<Book> ParseFromJsonFile()
@@ -30,19 +30,12 @@ namespace LibraryApplication.Services
         }
         public void ParseToJsonFile(List<Book> newBooksList)
         {
-            if (path != null && newBooksList != null)
+            try
             {
-                //TODO:HOW TOWRITE
                 File.WriteAllText(@"C:\Users\kater\Documents\dot-net\LibraryApplication\LibraryApplication\Data\BooksList.json", JsonConvert.SerializeObject(newBooksList));
-                /* using (StreamWriter file = File.CreateText(path))
- {
-                     JsonSerializer serializer = new JsonSerializer();
-                     serializer.Serialize(file, newBooksList);
-                 }*/
             }
-            else
+            catch (Exception )
             {
-                throw new FileNotFoundException();
             }
         }
     }

@@ -9,15 +9,16 @@ namespace LibraryApplication
     {
         static void Main(string[] args)
         {
-            ILogger logger = new ConsoleLogger();
-            UIService userInteractionService = new UIService(logger);
-            while (true)
+            UIService userInteractionService = new UIService();
+            bool isContinue = true;
+            while (isContinue)
             {
-                var userCommand = userInteractionService.DisplayListOfCommands();
+                userInteractionService.DisplayCommands();
+                var userCommand = userInteractionService.ReadCommands();
                 switch (userCommand)
                 {
                     case "list":
-                        userInteractionService.GenerateListOfBooks();
+                        userInteractionService.GenerateBooksList();
                         break;
                     case "add":
                         userInteractionService.AddNewBook();
@@ -31,7 +32,9 @@ namespace LibraryApplication
                     case "return":
                         userInteractionService.ReturnBook();
                         break;
-                    default:
+                    case "leave":
+                        isContinue = false;
+                        userInteractionService.ExitLibrary();
                         break;
                 }
             }
